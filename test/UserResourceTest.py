@@ -34,6 +34,11 @@ def test_user_post_missing_fields(client,mock_db):
     assert response.status == falcon.HTTP_400
     assert response.json == {'message': 'User name, age and email are required fields'}
 
+def test_user_post_invalid_name(client,mock_db):
+    response = client.simulate_post('/user-post',json={'name': 8, 'age': 12, 'email': 'john@example.com'})
+    assert response.status == falcon.HTTP_400
+    assert response.json == {'message': 'Invalid name'}
+
 def test_user_post_invalid_age(client,mock_db):
     response = client.simulate_post('/user-post',json={'name': 'John Doe', 'age': -9, 'email': 'john@example.com'})
     assert response.status == falcon.HTTP_400
@@ -69,3 +74,18 @@ def test_user_get_not_found(client, mock_db):
 
     assert  response.status == falcon.HTTP_404
     assert  response.json == {'message':'User not found'}
+
+def test_user_get_all_success(client, mock_db):
+   mock_db['users'].find.return_value = [
+       {'name': 'John Doe', 'age': 30, 'email': 'john@example.com'},
+       {'name': 'Kumar L', 'age': 35, 'email': 'kumar@example.com'}
+   ]
+
+   response = client.simulate_get('/user-get')
+   assert response.status == falcon.HTTP_200
+   assert  response.json == [
+       {'name': 'John Doe', 'age': 30, 'email': 'john@example.com'},
+       {'name': 'Kumar L', 'age': 35, 'email': 'kumar@example.com'}
+   ]
+
+

@@ -38,6 +38,12 @@ class UserPostResource:
             resp.media = {'message': 'User name, age and email are required fields'}
             return
 
+        #  Check if name is a string
+        if not isinstance(data.get('name'), str):
+            resp.status = falcon.HTTP_400
+            resp.media = {'message': 'Invalid name'}
+            return
+
         #  Check if age is integer and non-negative
         if not isinstance(data.get('age'), int) or data.get('age') < 0:
             resp.status = falcon.HTTP_400
@@ -50,11 +56,17 @@ class UserPostResource:
             resp.media = {'message': 'Email already exists'}
             return
 
-        # Check if the email is valid or not
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data.get('email')):
+        try:
+            # Check if the email is valid or not
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data.get('email')):
+                resp.status = falcon.HTTP_400
+                resp.media = {'message': 'Invalid email address'}
+                return
+        except TypeError as e:
             resp.status = falcon.HTTP_400
-            resp.media = {'message': 'Invalid email address'}
+            resp.media = {'message': 'Invalid input data'}
             return
+
 
         user = UserModel.from_dict(data)
         self.collection.insert_one(user.to_dict())

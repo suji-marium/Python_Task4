@@ -13,5 +13,15 @@
         "name": "Rohan George",
         "age": 25,
         "email": "rohan@gmail.com"
+    },
+    {
+        "name": "John Doe",
+        "age": 30,
+        "email": "john@example.com"
+    },
+    {
+        "name": "Sumi Saji",
+        "age": 21,
+        "email": "sumi@gmail.com"
     }
 ]

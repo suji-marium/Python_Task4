@@ -7,4 +7,5 @@ def create_routes(db):
 
     app.add_route('/user-post',UserPostResource(db))
     app.add_route('/user-get/{email}',UserGetResource(db))
+    app.add_route('/user-get', UserGetResource(db))
     return app

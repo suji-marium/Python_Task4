@@ -21,12 +21,11 @@ def client(app):
 
 
 def test_user_post_success(client, mock_db):
-    mock_db['users'].find_one.return_value = None
+    mock_db['users'].count_documents.return_value = 0
     response = client.simulate_post('/user-post', json={'name': 'John Doe', 'age': 30, 'email': 'john@example.com'})
 
     assert response.status == falcon.HTTP_201
     assert response.json == {'message': 'User created successfully'}
-
 
 def test_user_post_missing_fields(client,mock_db):
     response = client.simulate_post('/user-post',json={'age':12, 'email':'ramu@1234'})
@@ -44,10 +43,8 @@ def test_user_post_invalid_age(client,mock_db):
     assert response.status == falcon.HTTP_400
     assert response.json == {'message': 'Invalid age'}
 
-
 def test_user_post_invalid_email(client, mock_db):
-    mock_db['users'].find_one.return_value = None
-
+    mock_db['users'].count_documents.return_value = 0
     response = client.simulate_post('/user-post', json={'name': 'Jane Doe', 'age': 30, 'email': 'janeinvalid'})
 
     assert response.status == falcon.HTTP_400
@@ -55,10 +52,12 @@ def test_user_post_invalid_email(client, mock_db):
 
 
 def test_user_post_duplicate_email(client, mock_db):
+    mock_db['users'].count_documents.return_value = 1
     response = client.simulate_post('/user-post', json={'name': 'John Doe', 'age': 30, 'email': 'john@example.com'})
 
     assert response.status == falcon.HTTP_400
     assert response.json == {'message': 'Email already exists'}
+
 
 
 def test_user_get_success(client, mock_db):

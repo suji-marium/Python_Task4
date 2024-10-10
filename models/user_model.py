@@ -1,7 +1,9 @@
+from dataclasses import dataclass
+
 import falcon
 from bson import json_util
 from pymongo import MongoClient
-
+"""
 class UserModel:
     def __init__(self, name, age, email):
         self.name = name
@@ -22,3 +24,11 @@ class UserModel:
             age=data.get('age'),
             email=data.get('email')
         )
+"""
+
+@dataclass
+class User:
+    name:str=None
+    age:int=None
+    email:str=None
+

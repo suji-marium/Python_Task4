@@ -1,7 +1,7 @@
 import falcon
 from  bson import json_util
 import re
-from models.UserModel import UserModel
+from models.UserModel import User
 import UserWrite
 
 class UserGetResource:
@@ -26,11 +26,11 @@ class UserGetResource:
             resp.media = users  # Return list of users
 
 class UserPostResource:
-    def __init__(self,db):
+    def __init__(self, db):
         self.collection = db['users']
 
-    def on_post(self,req,resp):
-        data=req.media
+    def on_post(self, req, resp):
+        data = req.media
 
         # Check if all the required attributes are provided
         if not data.get('name') or not data.get('email') or not data.get('age'):
@@ -38,19 +38,19 @@ class UserPostResource:
             resp.media = {'message': 'User name, age and email are required fields'}
             return
 
-        #  Check if name is a string
+        # Check if name is a string
         if not isinstance(data.get('name'), str):
             resp.status = falcon.HTTP_400
             resp.media = {'message': 'Invalid name'}
             return
 
-        #  Check if age is integer and non-negative
+        # Check if age is integer and non-negative
         if not isinstance(data.get('age'), int) or data.get('age') < 0:
             resp.status = falcon.HTTP_400
             resp.media = {'message': 'Invalid age'}
             return
 
-        # Check if the email already exist
+        # Check if the email already exists
         if self.collection.find_one({"email": data.get('email')}):
             resp.status = falcon.HTTP_400
             resp.media = {'message': 'Email already exists'}
@@ -67,9 +67,10 @@ class UserPostResource:
             resp.media = {'message': 'Invalid input data'}
             return
 
+        user = User.__new__(User)
+        user.__dict__.update(data)
 
-        user = UserModel.from_dict(data)
-        self.collection.insert_one(user.to_dict())
-        UserWrite.write_user_to_file(user.to_dict())
+        self.collection.insert_one(user.__dict__)
+        UserWrite.write_user_to_file(user.__dict__)
         resp.status = falcon.HTTP_201
         resp.media = {'message': 'User created successfully'}

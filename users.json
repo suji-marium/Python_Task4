@@ -23,5 +23,35 @@
         "name": "Sumi Saji",
         "age": 21,
         "email": "sumi@gmail.com"
+    },
+    {
+        "name": "Chris Jacob",
+        "age": 28,
+        "email": "chris@gmail.com"
+    },
+    {
+        "name": "Suji",
+        "age": 23,
+        "email": "suji@gmail.com"
+    },
+    {
+        "name": "Kumar",
+        "email": "kumar@gmail.com",
+        "age": 30
+    },
+    {
+        "name": "Nandhu S",
+        "email": "nandhu@gmail.com",
+        "age": 30
+    },
+    {
+        "name": "Niya",
+        "email": "niya@gmail.com",
+        "age": 15
+    },
+    {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "age": 30
     }
 ]

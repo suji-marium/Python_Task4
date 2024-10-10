@@ -1,10 +1,10 @@
 import falcon
 from  bson import json_util
 import re
-from models.UserModel import User
-import UserWrite
+from models.user_model import User
+from user_write import write_user_to_file
 
-class UserGetResource:
+class UserGet:
     def __init__(self,db):
         self.collection = db['users']
 
@@ -25,7 +25,7 @@ class UserGetResource:
             resp.status = falcon.HTTP_200
             resp.media = users  # Return list of users
 
-class UserPostResource:
+class UserPost:
     def __init__(self, db):
         self.collection = db['users']
 
@@ -33,7 +33,7 @@ class UserPostResource:
         data = req.media
 
         # Check if all the required attributes are provided
-        if not data.get('name') or not data.get('email') or not data.get('age'):
+        if not all([data.get('name'), data.get('email'), data.get('age')]):
             resp.status = falcon.HTTP_400
             resp.media = {'message': 'User name, age and email are required fields'}
             return
@@ -51,11 +51,19 @@ class UserPostResource:
             return
 
         # Check if the email already exists
+        """
         if self.collection.find_one({"email": data.get('email')}):
             resp.status = falcon.HTTP_400
             resp.media = {'message': 'Email already exists'}
             return
-
+        """
+        # Check if the email already exists
+        email_count = self.collection.count_documents({"email": data.get('email')})
+        if email_count > 0:
+            resp.status = falcon.HTTP_400
+            resp.media = {'message': 'Email already exists'}
+            return
+        """
         try:
             # Check if the email is valid or not
             if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data.get('email')):
@@ -66,11 +74,17 @@ class UserPostResource:
             resp.status = falcon.HTTP_400
             resp.media = {'message': 'Invalid input data'}
             return
+        """
+        email = data.get('email')
+        if not isinstance(email, str) or not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            resp.status = falcon.HTTP_400
+            resp.media = {'message': 'Invalid email address'}
+            return
 
         user = User.__new__(User)
         user.__dict__.update(data)
 
         self.collection.insert_one(user.__dict__)
-        UserWrite.write_user_to_file(user.__dict__)
+        write_user_to_file(user.__dict__)
         resp.status = falcon.HTTP_201
         resp.media = {'message': 'User created successfully'}

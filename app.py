@@ -1,7 +1,7 @@
-import falcon
 from routes.api import create_routes
 from pymongo import MongoClient
 
+#Database connection
 client = MongoClient('mongodb://localhost:27017/')
 db = client['users'] #Database name
 app = create_routes(db)
